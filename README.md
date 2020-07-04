@@ -4,3 +4,4 @@ Created during "Learn to build an e-commerce app with .Net Core and Angular" (Ne
 - Angular,
 - Bootstrap,
 - Redis - basket lasts 30 days,
+- UnitOfWork,
