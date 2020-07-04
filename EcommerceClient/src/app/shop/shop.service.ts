@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { IPagination } from '../shared/models/pagination.interface';
 import { IBrand } from '../shared/models/brand.interface';
-import { IProductType } from '../shared/models/productType.interface';
+import { IProductType } from '../shared/models/product-type.interface';
 import { map } from 'rxjs/operators';
-import { ShopParams } from '../shared/models/shopParams';
+import { ShopParams } from '../shared/models/shop-params';
 import { IProduct } from '../shared/models/product.interface';
 import { environment } from 'src/environments/environment';
 

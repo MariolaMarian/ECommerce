@@ -1,0 +1,8 @@
+<div class="container mt-5">
+    <div>
+        
+        <h2><i class="fa fa-check-circle" style="color: green;"></i> Thank you. Your order is registered</h2>
+    </div>
+    <button class="btn btn-outline-success mt-3" *ngIf="order" routerLink="/orders/{{order?.id}}">View your order</button>
+    <button class="btn btn-outline-success mt-3" *ngIf="!order" routerLink="/orders">View your orders</button>
+</div>

@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { IBasket } from '../shared/models/basket.interface';
 import { BasketService } from './basket.service';
 import { IBasketItem } from '../shared/models/basket-item.interface';
+import { IBasketTotals } from '../shared/models/basket-totals.interface';
 
 @Component({
   selector: 'app-basket',
@@ -11,11 +12,13 @@ import { IBasketItem } from '../shared/models/basket-item.interface';
 })
 export class BasketComponent implements OnInit {
   basket$: Observable<IBasket>;
+  basketTotals$: Observable<IBasketTotals>;
 
   constructor(private basketService: BasketService) {}
 
   ngOnInit(): void {
     this.basket$ = this.basketService.basket$;
+    this.basketTotals$ = this.basketService.basketTotal$;
   }
 
   removeBasketItem(item: IBasketItem) {
