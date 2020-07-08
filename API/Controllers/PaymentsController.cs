@@ -4,6 +4,7 @@ using API.Errors;
 using Core.Entities;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -23,6 +24,14 @@ namespace API.Controllers
             _whSecret = config.GetSection("StripeSettings:WhSecret").Value;
         }
 
+        ///<summary>
+        /// To return basket with payment intent and client secret
+        ///</summary>
+        ///<response code="200">If payment intent was successfully created or updated</response>
+        ///<response code="400">If an error occured while trying to create or update payment intent </response>
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(CustomerBasket),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
         [Authorize]
         [HttpPost("{basketId}")]
         public async Task<ActionResult<CustomerBasket>> CreateOrUpdatePaymentIntent(string basketId)
@@ -34,9 +43,13 @@ namespace API.Controllers
                 return BadRequest(new ApiResponse(400, "Problem with basket"));
             }
 
-            return basket;
+            return Ok(basket);
         }
 
+        ///<summary>
+        /// To allow Stripe send notification to this application when payment event occurs
+        ///</summary>
+        ///<response code="200">Returns EmptyResult back to Stripe (Stripe would send event notifications to this application till he receives confirmation)</response>
         [HttpPost("webhook")]
         public async Task<ActionResult> StripeWebhook()
         {
@@ -63,6 +76,7 @@ namespace API.Controllers
                     break;    
             }
 
+            //striper wants confirmation, if he does not receive one, he will still send requests 
             return new EmptyResult();
         }
 

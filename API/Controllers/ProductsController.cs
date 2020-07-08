@@ -14,8 +14,6 @@ namespace API.Controllers
 {
     public class ProductsController : BaseApiController
     {
-        private readonly IGenericRepository<ProductType> _productTypesRepo;
-        private readonly IGenericRepository<ProductBrand> _productBrandsRepo;
         private readonly IGenericRepository<Product> _productsRepo;
         private readonly IMapper _mapper;
 
@@ -23,10 +21,11 @@ namespace API.Controllers
         {
             _productsRepo = productsRepo;
             _mapper = mapper;
-            _productBrandsRepo = productBrandsRepo;
-            _productTypesRepo = productTypesRepo;
         }
 
+        ///<summary>
+        /// To retrive paginated products list - cached for 10 minutes
+        ///</summary>
         [Cached(600)]
         [HttpGet]
         public async Task<ActionResult<Pagination<ProductToReturnDTO>>> GetProducts([FromQuery] ProductSpecParams productParams)
@@ -44,10 +43,14 @@ namespace API.Controllers
             return Ok(new Pagination<ProductToReturnDTO>(productParams.PageIndex, productParams.PageSize, totalItems, data));
         }
 
+        ///<summary>
+        /// To retrive product specified by it's id - cached for 10 minutes
+        ///</summary>
         [Cached(600)]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
+        [Produces("application/json")]
         public async Task<ActionResult<ProductToReturnDTO>> GetProduct(int id)
         {
             var spec = new ProductsWithTypesAndBrandsSpecification(id);
@@ -58,25 +61,7 @@ namespace API.Controllers
                 return NotFound(new ApiResponse(404));
             }
 
-            return _mapper.Map<Product, ProductToReturnDTO>(product);
-        }
-
-        [Cached(600)]
-        [HttpGet("brands")]
-        public async Task<ActionResult<List<Product>>> GetProductBrands()
-        {
-            var brands = await _productBrandsRepo.ListAllAsync();
-
-            return Ok(brands);
-        }
-
-        [Cached(600)]
-        [HttpGet("types")]
-        public async Task<ActionResult<List<Product>>> GetProductTypes()
-        {
-            var types = await _productTypesRepo.ListAllAsync();
-
-            return Ok(types);
+            return Ok(_mapper.Map<Product, ProductToReturnDTO>(product));
         }
 
     }

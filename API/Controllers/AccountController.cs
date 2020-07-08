@@ -6,6 +6,7 @@ using AutoMapper;
 using Core.Entities.Identity;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,9 +58,9 @@ namespace API.Controllers
         ///<summary>
         /// To return adress assigned to currently logged user
         ///</summary>
+        [Produces("application/json")]
         [Authorize]
         [HttpGet("adress")]
-        [Produces("application/json")]
         public async Task<ActionResult<AdressDTO>> GetUserAdress()
         {
             var user = await _userManager.FindUserByClaimsPrincipleWithAdressAsync(HttpContext.User);
@@ -72,9 +73,11 @@ namespace API.Controllers
         ///</summary>
         ///<response code="200">If adress was successfully changed</response>
         ///<response code="400">If saving new adress did not finished with success</response>
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(AdressDTO),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
         [Authorize]
         [HttpPut("adress")]
-        [Produces("application/json")]
 
         public async Task<ActionResult<AdressDTO>> UpdateUserAdress(AdressDTO adress)
         {
@@ -97,8 +100,10 @@ namespace API.Controllers
         ///</summary>
         /// <response code="200">If user is successfully logged</response>
         /// <response code="401">If user with specified username does not exist or password is incorrect for this username </response>
-        [HttpPost("login")]
         [Produces("application/json")]
+        [ProducesResponseType(typeof(LoginDTO),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status401Unauthorized)]
+        [HttpPost("login")]
 
         public async Task<ActionResult<UserDTO>> Login(LoginDTO loginDTO)
         {
@@ -129,8 +134,10 @@ namespace API.Controllers
         ///</summary>
         ///<response code="200">If user is successfully registered</response>
         ///<response code="400">If email is already used by another user or an error occured while trying to register new user </response>
-        [HttpPost("register")]
         [Produces("application/json")]
+        [ProducesResponseType(typeof(RegisterDTO),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
+        [HttpPost("register")]
 
         public async Task<ActionResult<UserDTO>> Register(RegisterDTO registerDTO)
         {

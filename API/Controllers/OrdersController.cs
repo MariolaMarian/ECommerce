@@ -11,6 +11,7 @@ using Core.Entities.OrderAgregate;
 using Core.Interfaces;
 using Core.Specifications;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -27,7 +28,11 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
+        ///<summary>
+        /// To retrive paginated orders created by currently logged user
+        ///</summary>
         [HttpGet]
+        [Produces("application/json")]
         public async Task<ActionResult<Pagination<OrderToReturnDTO>>> GetOrdersForUser([FromQuery] PaginationSpecParams paginationParams)
         {
             OrderSpecParams orderParams = _mapper.Map<OrderSpecParams>(paginationParams);
@@ -41,7 +46,15 @@ namespace API.Controllers
             return Ok(new Pagination<OrderToReturnDTO>(orderParams.PageIndex, orderParams.PageSize, totalCount, data));
         }
 
+        ///<summary>
+        /// To retrive product by it's id, user can only see his order
+        ///</summary>
+        ///<response code="200">If order was found</response>
+        ///<response code="400">If order was not found - order with this id does not exist or it does not belong to currently logged user</response>
         [HttpGet("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(OrderToReturnDTO),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<OrderToReturnDTO>> GetOrderByIdForUser(int id)
         {
             var email = HttpContext.User.GetEmailFromPrincipal();
@@ -56,14 +69,26 @@ namespace API.Controllers
             return Ok(_mapper.Map<OrderToReturnDTO>(order));
         }
 
+        ///<summary>
+        /// To retrive delivery methods
+        ///</summary>
         [AllowAnonymous]
         [HttpGet("deliveryMethods")]
+        [Produces("application/json")]
         public async Task<ActionResult<IReadOnlyList<DeliveryMethod>>> GetDeliveryMethods()
         {
             return Ok(await _orderService.GetDeliveryMethodsAsync());
         }
 
+        ///<summary>
+        /// To place new order
+        ///</summary>
+        ///<response code="200">If order was successfully created</response>
+        ///<response code="400">If an error occured while trying to create new order</response>
         [HttpPost]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(OrderDTO),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<Order>> CreateOrder(OrderDTO orderDTO)
         {
             var email = HttpContext.User.GetEmailFromPrincipal();

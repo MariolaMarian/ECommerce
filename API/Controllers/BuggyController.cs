@@ -1,6 +1,7 @@
 using API.Errors;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -21,9 +22,11 @@ namespace API.Controllers
         ///</summary>
         ///<response code="200">If user is authorized</response>
         ///<response code="401">If user is not authorized</response>
-        [HttpGet("testauth")]
+        [Produces("application/json","text/plain")]
+        [ProducesResponseType(typeof(string),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status401Unauthorized)]
         [Authorize]
-        [Produces("text/plain")]
+        [HttpGet("testauth")]
         public ActionResult<string> GetSecretText()
         {
             return "secret text";
@@ -33,6 +36,7 @@ namespace API.Controllers
         /// To return Not Found error
         ///</summary>
         ///<response code="404"></response>
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status404NotFound)]
         [HttpGet("notfound")]
         public ActionResult GetNotFoundRequest()
         {
@@ -50,6 +54,7 @@ namespace API.Controllers
         /// To return Server Error error
         ///</summary>
         ///<response code="500"></response>
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status500InternalServerError)]
         [HttpGet("servererror")]
         public ActionResult GetServerError()
         {
@@ -64,6 +69,7 @@ namespace API.Controllers
         /// To return Bad Request error
         ///</summary>
         ///<response code="400"></response>
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status400BadRequest)]
         [HttpGet("badrequest")]
         public ActionResult GetBadRequest()
         {
