@@ -5,13 +5,17 @@ using System.Threading.Tasks;
 using API.DTOs;
 using API.Errors;
 using API.Extensions;
+using API.Helpers;
 using AutoMapper;
 using Core.Entities.OrderAgregate;
 using Core.Interfaces;
+using Core.Specifications;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [Authorize]
     public class OrdersController : BaseApiController
     {
         private readonly IOrderService _orderService;
@@ -24,13 +28,17 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<OrderToReturnDTO>>> GetOrdersForUser()
+        public async Task<ActionResult<Pagination<OrderToReturnDTO>>> GetOrdersForUser([FromQuery] PaginationSpecParams paginationParams)
         {
-            var email = HttpContext.User.GetEmailFromPrincipal();
+            OrderSpecParams orderParams = _mapper.Map<OrderSpecParams>(paginationParams);
+            orderParams.Email = HttpContext.User.GetEmailFromPrincipal();
 
-            var orders = await _orderService.GetOrdersForUserAsync(email);
+            var orders = await _orderService.GetOrdersForUserAsync(orderParams);
+            var data = _mapper.Map<IReadOnlyList<OrderToReturnDTO>>(orders);
 
-            return Ok(_mapper.Map<IReadOnlyList<OrderToReturnDTO>>(orders));
+            var totalCount = await _orderService.GetCountOrdersForUserAsync(orderParams);
+
+            return Ok(new Pagination<OrderToReturnDTO>(orderParams.PageIndex, orderParams.PageSize, totalCount, data));
         }
 
         [HttpGet("{id}")]
@@ -48,6 +56,7 @@ namespace API.Controllers
             return Ok(_mapper.Map<OrderToReturnDTO>(order));
         }
 
+        [AllowAnonymous]
         [HttpGet("deliveryMethods")]
         public async Task<ActionResult<IReadOnlyList<DeliveryMethod>>> GetDeliveryMethods()
         {

@@ -13,6 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 import { IBasket } from 'src/app/shared/models/basket.interface';
 import { IOrder } from 'src/app/shared/models/order.interface';
 import { Router, NavigationExtras } from '@angular/router';
+import { OrdersService } from 'src/app/orders/orders.service';
 
 declare var Stripe;
 
@@ -41,7 +42,8 @@ export class CheckoutPaymentComponent implements AfterViewInit, OnDestroy {
     private basketService: BasketService,
     private checkoutService: CheckoutService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private orderService: OrdersService
   ) {}
 
   ngAfterViewInit(): void {
@@ -94,6 +96,7 @@ export class CheckoutPaymentComponent implements AfterViewInit, OnDestroy {
 
     try {
       const createdOrder = await this.createOrder(basket);
+      this.orderService.useCache = false;
       const paymentResult = await this.confirmPaymentWithStripe(basket);
 
       if (paymentResult.paymentIntent) {

@@ -3,9 +3,8 @@ import { IProduct } from './product.interface';
 
 export class Pagination implements IPagination
 {
-    pageIndex: number;
-    pageSize: number;
+    pageIndex = 1;
+    pageSize = 6;
     count: number;
-    data: IProduct[] = [];
-    
+    data: any[] = [];
 }

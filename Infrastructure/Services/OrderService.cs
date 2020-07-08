@@ -67,16 +67,23 @@ namespace Infrastructure.Services
 
         public async Task<Order> GetOrderByIdAsync(int id, string buyerEmail)
         {
-            var spec = new OrdersWithItemsAndOrderingSpecification(id, buyerEmail);
+            var spec = new OrdersWithItemsAndDeliveryMethodSpecification(id, buyerEmail);
 
             return await _unitOfWork.Repository<Order>().GetEntityWithSpec(spec);
         }
 
-        public async Task<IReadOnlyList<Order>> GetOrdersForUserAsync(string buyerEmail)
+        public async Task<IReadOnlyList<Order>> GetOrdersForUserAsync(OrderSpecParams orderSpecParams)
         {
-            var spec = new OrdersWithItemsAndOrderingSpecification(buyerEmail);
+            var spec = new OrdersWithItemsAndDeliveryMethodSpecification(orderSpecParams);
 
             return await _unitOfWork.Repository<Order>().ListAsync(spec);
+        }
+
+        public async Task<int> GetCountOrdersForUserAsync(OrderSpecParams orderSpecParams)
+        {
+            var countSpec = new OrdersWithItemsAndDeliveryMethodCountSpecification(orderSpecParams);
+
+            return await _unitOfWork.Repository<Order>().CountAsync(countSpec);
         }
     }
 }

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { IOrder } from 'src/app/shared/models/order.interface';
+import { OrdersService } from 'src/app/orders/orders.service';
+import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-checkout-success',
@@ -19,4 +21,8 @@ export class CheckoutSuccessComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  seeOrders() {
+    this.router.navigate(['orders']);
+  }
 }
